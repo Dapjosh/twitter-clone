@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+* {
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: "malgunbd";
+  src: url("./assets/malgunbd.ttf");
+}
+
+.malgun {
+  font-family: "malgun", sans-serif;
+}
+
+.roboto {
+  font-family: "Roboto", sans-serif;
+}
+
+.border-bottom {
+  border-bottom: 0.1px solid #b8b8b8;
+}
+
+/* //AnalyticsCard component  */
+.active-card {
+  position: relative;
+}
+
+.active-card::before {
+  position: absolute;
+  content: "";
+  top: 0%;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background-color: rgba(37, 100, 235, 0.816);
+}
+
+.chart-container {
+}
+
+/* p {
+  font-family: "Poppins", sans-serif;
+} */
