@@ -1,12 +1,12 @@
-import React from 'react';
-import SinglePost from './SinglePost';
+/* eslint-disable react/prop-types */
+import React from "react";
 
-export default function PostSection({ posts }) {
-    return (
-        <div>
-            {posts.map((post) => (
-                <SinglePost post={post} key={post.id} />
-            ))}
-        </div>
-    );
+import TabbedComponent from "./TabbedComponent";
+
+export default function PostSection({ posts, videos }) {
+  return (
+    <div>
+      <TabbedComponent posts={posts} videos={videos} />
+    </div>
+  );
 }

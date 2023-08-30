@@ -1,3 +1,3 @@
-export { default as NewsFeed } from './newsfeed/NewsFeed';
+export { default as NewsFeed } from "./newsfeed/NewsFeed";
 
 //

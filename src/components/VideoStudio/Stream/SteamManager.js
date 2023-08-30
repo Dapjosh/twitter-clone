@@ -1,5 +1,5 @@
-import React from 'react';
+import React from "react";
 
 export default function SteamManager() {
-    return <div>SteamManager</div>;
+  return <div>SteamManager</div>;
 }
