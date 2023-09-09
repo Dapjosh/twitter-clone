@@ -1,10 +1,11 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react/no-unescaped-entities */
 import axios from "axios"; // Import axios
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,13 +13,22 @@ export default function Login() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/users/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      const { userId, token } = response.data;
 
       // Handle successful login, e.g., set authentication token in local storage
-      console.log(response.data); // The response from the backend
+      onLogin(userId, token);
+      // localStorage.setItem("authToken", token);
+      // localStorage.setItem("userID", userId);
+      // localStorage.setItem("userEmail", email);
+      // console.log(response.data); // The response from the backend
       navigate("/");
     } catch (error) {
       // Handle login error

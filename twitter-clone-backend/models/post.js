@@ -3,51 +3,71 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const postSchema = new Schema({
-  user: {
-    type: mongoose.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-    maxlength: 280,
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
-  likes: [
-    {
+const postSchema = new Schema(
+  {
+    user: {
       type: mongoose.Types.ObjectId,
       ref: "User",
+      required: true,
     },
-  ],
-  retweets: [
-    {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
+    content: {
+      type: String,
+      required: false,
+      maxlength: 280,
     },
-  ],
-  comments: [
-    {
-      user: {
+    media: [
+      {
+        type: String, // Store URLs or references to media files
+      },
+    ],
+    mediaType: {
+      type: String, // Store the type of media (e.g., "text", "image", "video", etc.)
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
+    },
+    likes: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Like",
+      },
+    ],
+    retweets: [
+      {
         type: mongoose.Types.ObjectId,
         ref: "User",
       },
-      content: {
-        type: String,
-        required: true,
+    ],
+    comments: [
+      {
+        text: String,
+        created: { type: Date, default: Date.now() },
+        postedBy: { type: mongoose.Schema.ObjectId, ref: "User" },
       },
-      timestamp: {
-        type: Date,
-        default: Date.now,
+    ],
+
+    views: [
+      {
+        user: {
+          type: mongoose.Types.ObjectId,
+          ref: "User",
+        },
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
       },
-    },
-  ],
-  followers: [{ type: mongoose.Types.ObjectId, ref: "User" }],
-  following: [{ type: mongoose.Types.ObjectId, ref: "User" }],
-});
+    ],
+    keywords: [
+      {
+        text: String,
+        weight: { type: Number, default: 0 },
+        timestamp: { type: Date, default: Date.now() },
+      },
+    ],
+  },
+  { strict: false }
+);
 
 module.exports = mongoose.model("Post", postSchema);

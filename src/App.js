@@ -1,5 +1,6 @@
-import { useLayoutEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import axios from "axios";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Nav from "./components/Nav";
 import Discover from "./pages/Discover";
 import EditProfilePage from "./pages/EditProfilePage";
@@ -28,28 +29,74 @@ const Wrapper = ({ children }) => {
 };
 
 function App() {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is authenticated (e.g., by verifying the token)
+    const authToken = localStorage.getItem("authToken");
+    const userID = localStorage.getItem("userID");
+
+    if (authToken) {
+      setIsLoggedIn(true);
+      console.log(userID);
+    }
+  }, []);
+
+  const handleLogin = (userId, token) => {
+    localStorage.setItem("authToken", token);
+    localStorage.setItem("userID", userId);
+    setIsLoggedIn(true);
+    console.log(isLoggedIn);
+  };
+
+  const handleLogOut = () => {
+    axios
+      .post("http://localhost:8000/api/users/logout")
+      .then((response) => {
+        console.log(response.data.message);
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userID");
+        setIsLoggedIn(false);
+        navigate("/login");
+        // Redirect the user or perform other actions
+      })
+      .catch((error) => {
+        // Handle errors, e.g., unauthorized or network issues
+        console.error("Logout failed:", error);
+      });
+  };
   return (
     <>
-      <Nav />
+      <Nav isLoggedIn={isLoggedIn} handleLogOut={handleLogOut} />
       <Wrapper>
         <Routes>
-          <Route path="/" index element={<Home />} />
-          <Route path="/posts/:id" element={<SinglePostView />} />
-          <Route path="/studio/:id" element={<VideoStudioPage />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/account" element={<Profile />} />
-          <Route path="/users/:id" element={<Users />} />
-          <Route path="/discover" element={<Discover />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/subscription" element={<Subscriptions />} />
-          <Route path="/messages" element={<MessagesPage />} />
-          <Route path="/analytics" element={<PostAnalytics />} />
-          <Route path="/watch" element={<Watch />} />
-          <Route path="/watch/:id" element={<SingleVideo />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/edit" element={<EditProfilePage />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          {isLoggedIn && (
+            <>
+              <Route path="/" index element={<Home />} />
+              <Route path="/posts/:id" element={<SinglePostView />} />
+              <Route path="/studio/:id" element={<VideoStudioPage />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/account" element={<Profile />} />
+              <Route path="/users/:id" element={<Users />} />
+              <Route path="/discover" element={<Discover />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/subscription" element={<Subscriptions />} />
+              <Route path="/messages" element={<MessagesPage />} />
+              <Route path="/analytics" element={<PostAnalytics />} />
+
+              <Route path="/edit" element={<EditProfilePage />} />
+            </>
+          )}
+          {!isLoggedIn && (
+            <>
+              <Route path="/search" element={<Search />} />
+              <Route path="/watch" element={<Watch />} />
+              <Route path="/watch/:id" element={<SingleVideo />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            </>
+          )}
         </Routes>
       </Wrapper>
     </>

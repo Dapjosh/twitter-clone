@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 const fs = require("fs");
 const path = require("path");
@@ -8,6 +7,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
+const tweetRoutes = require("./routes/tweet-routes");
 const HttpError = require("./models/http-error");
 
 const app = express();
@@ -39,6 +39,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/tweet", tweetRoutes);
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 
@@ -48,6 +49,7 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  console.log(error);
   if (req.file) {
     fs.unlink(req.file.path, (err) => {
       console.log(err);
@@ -59,9 +61,10 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occurred!" });
 });
-// const mongo_DB_URI = "mongodb://0.0.0.0:27017/twit001";
-const mongo_DB_URI =
-  "mongodb+srv://twit001:6NoD9Dagh6BbkM5v@twitter-clone.u6e2mkh.mongodb.net/?retryWrites=true&w=majority";
+
+const mongo_DB_URI = "mongodb://0.0.0.0:27017/twit001";
+// const mongo_DB_URI =
+//   "mongodb+srv://blaze32:NmPomviOCjMy8oOt@cluster0.s0kzobs.mongodb.net/?retryWrites=true&w=majority";
 mongoose
   .connect(mongo_DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {

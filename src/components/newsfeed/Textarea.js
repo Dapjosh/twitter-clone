@@ -1,18 +1,51 @@
+import axios from "axios";
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { BiImageAlt, BiVideo, CgMediaLive } from "../../constant/icons";
-import users from "../../constant/users";
 
 export default function Textarea() {
-  const loggedInUser = "@Mohammadali003";
+  const userID = localStorage.getItem("userID");
+  // const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
+  let loggedInUser;
+  if (userID) {
+    loggedInUser = userID;
+  }
+
+  const getExistingUser = async (uid) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/users/${uid}`
+      );
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  };
+  const existingUser = getExistingUser(loggedInUser);
   const [file, setFile] = useState("");
+  const [originalFileName, setOriginalFileName] = useState("");
+  const [tweetText, setTweetText] = useState({
+    newTweet: "",
+  });
+
   const inputRef = useRef(null);
   const textRef = useRef(null);
+  const [isInputEmpty, setIsInputEmpty] = useState(true);
 
   const handleImgfiles = (e) => {
-    const { name } = e.target.files[0] || {};
-    setFile(e.target.files);
-    setFile(name);
+    const selectedFile = e.target.files[0];
+    console.log(selectedFile);
+    setOriginalFileName(selectedFile);
+    if (!selectedFile) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageDataUrl = event.target.result;
+      setFile(imageDataUrl);
+    };
+    reader.readAsDataURL(selectedFile);
   };
 
   const handleRemovefile = () => {
@@ -20,32 +53,81 @@ export default function Textarea() {
     setFile("");
   };
 
-  const handleChange = () => {
+  const handleChange = (e) => {
     textRef.current.style.height = "auto";
     textRef.current.style.height = `${textRef.current.scrollHeight}px`;
+
+    setIsInputEmpty(tweetText.newTweet.trim() === "");
+    setTweetText({ ...tweetText, [e.target.name]: e.target.value });
   };
 
-  const existingUser = users.find((u) => u.userName === loggedInUser);
+  const handleTweetSubmit = () => {
+    if (tweetText.newTweet.trim() === "") {
+      // Don't allow submitting empty tweets
+      return;
+    }
+    // Prepare data for the tweet
+    const formData = new FormData();
+    formData.append("content", tweetText.newTweet);
+    formData.append("userID", loggedInUser);
+
+    if (file) {
+      // Append the selected image file to the FormData object
+      formData.append("media", originalFileName);
+    }
+
+    // Send a POST request to create the new tweet
+    axios
+      .post("http://localhost:8000/api/tweet/new", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Set content type to multipart form-data
+        },
+      })
+      .then((response) => {
+        // Handle successful tweet creation, e.g., show a success message
+        console.log("Tweet created successfully:", response.data);
+        setTweetText({
+          newTweet: "",
+        }); // Clear the tweet text
+        setFile(null);
+        inputRef.current.value = null;
+      })
+      .catch((error) => {
+        // Handle errors, e.g., display an error message
+        console.error("Error creating tweet:", error);
+      });
+  };
 
   return (
     <div className="border-b-[.5px] border-gray-300">
       <div className="flex items-start gap-4 py-4 pt-3 px-4">
         <div>
-          <img className="h-12 w-12 rounded-full" src={existingUser.img} alt="user" />
+          <img
+            className="h-12 w-12 rounded-full"
+            src={existingUser.img}
+            alt="user"
+          />
         </div>
         <form className="flex-1 mt-[2px]">
           <textarea
             rows="1"
+            id="newTweet"
+            name="newTweet"
             placeholder="What's on your mind"
             onChange={handleChange}
+            value={tweetText.newTweet}
             ref={textRef}
             className="focus:outline-none outline-none resize-none w-full py-2 text-xl placeholder:text-gray-500 font-regular"
           />
           {file && (
-            <div>
-              {file}
-              <button type="button" onClick={handleRemovefile}>
-                X
+            <div className="flex items-start">
+              <img src={file} alt="Uploaded Photo" className="full-photo" />
+              <button
+                type="button"
+                className="rounded-full bg-sky-300 p-2 m-3 text-white"
+                onClick={handleRemovefile}
+              >
+                x
               </button>
             </div>
           )}
@@ -77,14 +159,21 @@ export default function Textarea() {
                 <CgMediaLive fontSize={19} />
               </Link>
             </div>
-            {/* <button
-                            className="py-[6px] text-white font-semibold px-7 rounded-full bg-blue-600 hover:bg-blue-500"
-                            type="button"
-                        >
-                            Post
-                        </button> */}
+            <button
+              className={`py-[6px] text-white font-semibold px-7 rounded-full ${
+                isInputEmpty
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-500"
+              }`}
+              type="button"
+              onClick={handleTweetSubmit}
+              disabled={isInputEmpty}
+            >
+              Post
+            </button>
           </div>
         </form>
+        {/* {file && <img src={file} alt="Uploaded Photo" className="full-photo" />} */}
       </div>
     </div>
   );

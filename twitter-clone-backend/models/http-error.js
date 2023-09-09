@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 class HttpError extends Error {
   constructor(message, errorCode) {
     super(message);

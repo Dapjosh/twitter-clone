@@ -15,9 +15,8 @@ export default function Register() {
 
   // const { fullName, email, password } = inputValue;
 
-  const handleOnChange = (e) => {
-    const { name, value } = e.target;
-    setInputValue({ ...inputValue, [name]: value });
+  const handleChange = (e) => {
+    setInputValue({ ...inputValue, [e.target.name]: e.target.value });
   };
   // const handleSuccess = (msg) =>
   //   toast.success(msg, {
@@ -31,20 +30,32 @@ export default function Register() {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    console.log(inputValue);
+
     // Validate the user input
     if (!inputValue.fullName) {
-      toast.error("Please enter your full name");
+      toast.error("Please enter your full name", {
+        position: "bottom-left",
+        width: "50px",
+        height: "50px",
+      });
       return;
     }
 
     if (!inputValue.email) {
-      toast.error("Please enter your email address");
+      toast.error("Please enter your email address", {
+        position: "bottom-left",
+        width: "50px",
+        height: "50px",
+      });
       return;
     }
 
     if (!inputValue.password) {
-      toast.error("Please enter your password");
+      toast.error("Please enter your password", {
+        position: "bottom-left",
+        width: "50px",
+        height: "50px",
+      });
       return;
     }
 
@@ -52,20 +63,12 @@ export default function Register() {
     try {
       const { data } = await axios.post(
         "http://localhost:8000/api/users/signup",
-        JSON.stringify(inputValue),
-        // {
-        //   ...inputValue,
-        // },
+        // JSON.stringify(inputValue),
+        {
+          ...inputValue,
+        },
         { withCredentials: true }
       );
-      // const { data } = await fetch("http://localhost:8000/api/users/signup", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(inputValue),
-      //   credentials: "include",
-      // });
 
       console.log(data);
       const { success, message } = data;
@@ -99,7 +102,7 @@ export default function Register() {
           </Link>
         </p>
       </header>
-      <form className="grid gap-y-2" onSubmit={handleRegisterSubmit}>
+      <form className="grid gap-y-2" noValidate onSubmit={handleRegisterSubmit}>
         <label className="flex flex-col" htmlFor="fullName">
           <span className="text-sm mb-1 font-semibold">Full Name</span>
           <input
@@ -107,10 +110,10 @@ export default function Register() {
             className="bg-gray-100 rounded-md outline-none px-3 py-2"
             type="text"
             id="fullName"
+            name="fullName"
             placeholder="Mohammah Ali"
-            // value={inputValue.fullName}
-            onChange={handleOnChange}
-            // onChange={(e) => setInputValue(e.target.value)}
+            value={inputValue.fullName}
+            onChange={handleChange}
           />
         </label>
         <label className="flex flex-col" htmlFor="email">
@@ -120,10 +123,10 @@ export default function Register() {
             className="bg-gray-100 rounded-md outline-none px-3 py-2"
             type="email"
             id="email"
+            name="email"
             placeholder="mohammah@gmail.com"
-            // value={inputValue.email}
-            onChange={handleOnChange}
-            // onChange={(e) => setInputValue(e.target.value)}
+            value={inputValue.email}
+            onChange={handleChange}
           />
         </label>
         <label className="flex flex-col" htmlFor="password">
@@ -133,10 +136,10 @@ export default function Register() {
             className="bg-gray-100 rounded-md outline-none px-3 py-2"
             type="password"
             id="password"
+            name="password"
             placeholder="Password"
-            // value={inputValue.password}
-            onChange={handleOnChange}
-            // onChange={(e) => setInputValue(e.target.value)}
+            value={inputValue.password}
+            onChange={handleChange}
           />
         </label>
         <label

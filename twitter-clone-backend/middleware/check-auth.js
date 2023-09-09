@@ -1,21 +1,25 @@
-const jwt = require('jsonwebtoken');
+/* eslint-disable no-undef */
+const jwt = require("jsonwebtoken");
 
-const HttpError = require('../models/http-error');
+const secretKey =
+  "74ca896d874c7ddc3dadb1d6c8c9fefc88c487690c69cfc516c9c7869591245b";
+
+const HttpError = require("../models/http-error");
 
 module.exports = (req, res, next) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return next();
   }
   try {
-    const token = req.headers.authorization.split(' ')[1]; // Authorization: 'Bearer TOKEN'
+    const token = req.headers.authorization.split(" ")[1]; // Authorization: 'Bearer TOKEN'
     if (!token) {
-      throw new Error('Authentication failed!');
+      throw new Error("Authentication failed!");
     }
-    const decodedToken = jwt.verify(token, 'supersecret_dont_share');
+    const decodedToken = jwt.verify(token, secretKey);
     req.userData = { userId: decodedToken.userId };
     next();
   } catch (err) {
-    const error = new HttpError('Authentication failed!', 403);
+    const error = new HttpError("Authentication failed!", 403);
     return next(error);
   }
 };
