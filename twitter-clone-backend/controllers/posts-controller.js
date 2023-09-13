@@ -7,6 +7,7 @@ const HttpError = require("../models/http-error");
 const axios = require("axios").default;
 
 const Post = require("../models/post");
+const User = require("../models/user");
 
 const edenNLPKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGNmMzFjNTgtNGRlMC00MDc3LThhZDgtMmJlOWMwN2U4NGVhIiwidHlwZSI6ImFwaV90b2tlbiJ9.eHngTN0AVus2Qh8gUtRRq7T6UYyMdPWM403oVAeijKw";
@@ -82,7 +83,7 @@ const newTweet = async (req, res, next) => {
 
         keywordIds.push(topKeywords);
       } catch (err) {
-        const error = new HttpError("Error retrieving keywords", 500);
+        const error = new HttpError("Error retrieving keywords " + err, 500);
         return next(error);
       }
       passToNewTweet(keywordIds);
@@ -121,4 +122,70 @@ const newTweet = async (req, res, next) => {
   }
 };
 
+const listNewsFeed = async (req, res, next) => {
+  const userID = req.params.uid;
+  existingUser = await User.findOne({ _id: userID });
+  try {
+    let posts = await Post.find({})
+      .populate("comments.postedBy", "_id name")
+      .populate("user", "_id name")
+      .sort("-timestamp")
+      .exec();
+    res.json({ posts: posts, user: existingUser });
+  } catch (err) {
+    const error = new HttpError("Error listing new posts " + err, 500);
+    return next(error);
+  }
+};
+
+const comment = async (req, res, next) => {
+  const { content, userID, postID } = req.body;
+
+  try {
+    const post = await Post.findById(postID);
+
+    if (!post) {
+      const error = new HttpError("Post not found", 404);
+      return next(error);
+    }
+    const newComment = {
+      content: content,
+      postedBy: userID,
+    };
+    post.comments.push(newComment);
+
+    // Save the updated Post document
+    const result = await post.save();
+    res.json(result);
+  } catch (err) {
+    const error = new HttpError("Error making comments " + err, 400);
+    return next(error);
+  }
+};
+
+const listComments = async (req, res, next) => {
+  const postID = req.params.pid;
+
+  try {
+    let posts = await Post.find({ _id: postID })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "postedBy",
+          model: "User",
+        },
+        options: { sort: { created: -1 } },
+      })
+      .exec();
+    res.json(posts[0].comments);
+    console.log(posts[0].comments);
+  } catch (err) {
+    const error = new HttpError("Error listing comments " + err, 400);
+    return next(error);
+  }
+};
+
 exports.newTweet = newTweet;
+exports.comment = comment;
+exports.listNewsFeed = listNewsFeed;
+exports.listComments = listComments;

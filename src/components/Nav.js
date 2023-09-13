@@ -17,11 +17,18 @@ import NotificationDropDown from "./notifications/DropDown/NotificationDropDown"
 
 export default function Nav({ isLoggedIn, handleLogOut }) {
   console.log(isLoggedIn);
-  const userID = localStorage.getItem("userID");
+  const storedUserData = localStorage.getItem("userData");
+  console.log(storedUserData);
+
+  // Parse the JSON string back to an object
+
+  const userData = storedUserData ? JSON.parse(storedUserData) : null;
+
+  const token = localStorage.getItem("authToken");
 
   let loggedInUser;
-  if (userID) {
-    loggedInUser = userID;
+  if (userData) {
+    loggedInUser = userData._id;
   }
   console.log("The logged user " + loggedInUser);
 
@@ -63,6 +70,7 @@ export default function Nav({ isLoggedIn, handleLogOut }) {
 
   const getExistingUser = async (uid) => {
     try {
+      axios.defaults.headers.common["x-auth-token"] = `Bearer ${token}`;
       const response = await axios.get(
         `http://localhost:8000/api/users/${uid}`
       );

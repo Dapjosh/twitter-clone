@@ -5,6 +5,7 @@ import TextArea from "./Textarea";
 import VideosComponent from "./VideosComponent";
 // eslint-disable-next-line react/prop-types
 export default function TabbedComponent({ posts, videos }) {
+  console.log("The posts: " + posts);
   const [activeTab, setActiveTab] = useState("forYou");
   const openTab = (tabName) => {
     setActiveTab(tabName);
@@ -47,7 +48,7 @@ export default function TabbedComponent({ posts, videos }) {
       >
         {/* post's video and image */}
         {posts.map((post) => (
-          <SinglePost post={post} key={post.id} />
+          <SinglePost post={post} key={post._id} />
         ))}
       </div>
     </div>

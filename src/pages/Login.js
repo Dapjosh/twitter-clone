@@ -1,30 +1,28 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unescaped-entities */
-import axios from "axios"; // Import axios
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
+import { login } from "../AuthService";
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+  });
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/users/login",
-        {
-          email,
-          password,
-        }
-      );
+      const token_data = await login(credentials);
+      const userData = token_data.user;
+      const token = token_data.token;
 
-      const { userId, token } = response.data;
-
+      console.log("Login " + token);
+      console.log("Login details" + userData);
       // Handle successful login, e.g., set authentication token in local storage
-      onLogin(userId, token);
+      onLogin(userData, token);
       // localStorage.setItem("authToken", token);
       // localStorage.setItem("userID", userId);
       // localStorage.setItem("userEmail", email);
@@ -57,8 +55,10 @@ export default function Login({ onLogin }) {
             type="email"
             id="email"
             placeholder="mohammah@gmail.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={credentials.email}
+            onChange={(e) =>
+              setCredentials({ ...credentials, email: e.target.value })
+            }
           />
         </label>
         <label className="flex flex-col" htmlFor="password">
@@ -68,8 +68,10 @@ export default function Login({ onLogin }) {
             type="password"
             id="password"
             placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={credentials.password}
+            onChange={(e) =>
+              setCredentials({ ...credentials, password: e.target.value })
+            }
           />
         </label>
         <div className="py-3 flex items-center justify-between">

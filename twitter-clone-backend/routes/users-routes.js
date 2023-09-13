@@ -2,6 +2,8 @@
 const express = require("express");
 const { check } = require("express-validator");
 
+const verifyAuth = require("../middleware/check-auth");
+
 const usersController = require("../controllers/users-controllers");
 // const fileUpload = require("../middleware/file-upload");
 // Configure multer for file uploads
@@ -10,7 +12,7 @@ const router = express.Router();
 
 router.get("/", usersController.getUsers);
 
-router.get("/:uid", usersController.getSpecificUser);
+router.get("/:uid", verifyAuth.signin, usersController.getSpecificUser);
 
 router.post(
   "/signup",
@@ -28,35 +30,80 @@ router.post("/logout", usersController.logout);
 
 router.post("/bookmark/:pid/:uid", usersController.bookmarkPost);
 
-router.post("/notification/:uid/:event", usersController.addNotifications);
+router.post(
+  "/notification/:uid/:event",
+  verifyAuth.signin,
+  usersController.addNotifications
+);
 
-router.delete("/notification/:uid", usersController.clearNotifications);
+router.delete(
+  "/notification/:uid",
+  verifyAuth.signin,
+  usersController.clearNotifications
+);
 
-router.post("/verify/:uid", usersController.verifyAccount);
+router.post("/verify/:uid", verifyAuth.signin, usersController.verifyAccount);
 
 router.post(
   "/saveVerificationDetails/:uid",
+  verifyAuth.signin,
   usersController.saveVerificationDetails
 );
 
-router.post("/users/pay", usersController.makePayment);
+router.post("/users/pay", verifyAuth.signin, usersController.makePayment);
 
-router.post("/users/subscribe/:uid/:planId", usersController.subscribeUser);
+router.post(
+  "/users/subscribe/:uid/:planId",
+  verifyAuth.signin,
+  usersController.subscribeUser
+);
 
-router.post("/users/message", usersController.sendMessage);
+router.post(
+  "/users/message",
+  verifyAuth.requireSignin,
+  usersController.sendMessage
+);
 
-router.get("/users/message", usersController.getMessage);
+router.get(
+  "/users/message",
+  verifyAuth.requireSignin,
+  usersController.getMessage
+);
 
-router.post("/users/block/:uid", usersController.blockUser);
+router.post(
+  "/users/block/:uid",
+  verifyAuth.requireSignin,
+  usersController.blockUser
+);
 
-router.post("/users/mute/:uid", usersController.muteUser);
+router.post(
+  "/users/mute/:uid",
+  verifyAuth.requireSignin,
+  usersController.muteUser
+);
 
-router.post("/users/report/:uid", usersController.reportUser);
+router.post(
+  "/users/report/:uid",
+  verifyAuth.requireSignin,
+  usersController.reportUser
+);
 
-router.post("/addPaymentMethod/:uid", usersController.addPaymentMethod);
+router.post(
+  "/addPaymentMethod/:uid",
+  verifyAuth.requireSignin,
+  usersController.addPaymentMethod
+);
 
-router.get("/getAccessRights/:uid", usersController.getAccessRights);
+router.get(
+  "/getAccessRights/:uid",
+  verifyAuth.requireSignin,
+  usersController.getAccessRights
+);
 
-router.get("/getUserByString/:subName", usersController.getUserByString);
+router.get(
+  "/getUserByString/:subName",
+  verifyAuth.requireSignin,
+  usersController.getUserByString
+);
 
 module.exports = router;

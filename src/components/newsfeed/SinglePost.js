@@ -3,15 +3,23 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiMoreHorizontal } from "../../constant/icons";
-import users from "../../constant/users";
 import CommentField from "../comments/CommentField";
 import DotsOptions from "./DotsOptions";
 import ReactionIcons from "./ReactionIcons";
 
-export default function SinglePost({ post, singlePage }) {
-  const { name, img, userName, description, time, video } = post || {};
+export default function SinglePost({ post }) {
+  console.log(post);
+  // const { name, img, userName, description, time, video } = post || {};
+  const storedUserData = localStorage.getItem("userData");
+
+  // Parse the JSON string back to an object
+  const userData = storedUserData ? JSON.parse(storedUserData) : null;
+
+  // const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
+
   const [showPopUp, setShowPopUp] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [showCommentInput, setShowCommentInput] = useState(false);
 
   const handleMore = () => {
     setShowMore(() => !showMore);
@@ -22,15 +30,25 @@ export default function SinglePost({ post, singlePage }) {
     setShowMore(false);
   };
 
-  const existingUser = users.find((u) => u.userName === userName);
+  const handleCommentClick = () => {
+    setShowCommentInput(!showCommentInput); // Toggle comment input visibility
+    setShowMore(false); // Close more options when clicking comment
+  };
 
+  // // const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
+
+  console.log("The real user " + userData._id);
   return (
     <div className="flex items-start p-4 gap-2">
       {/* profile picture of all users */}
       <div className="basis-[10%]">
-        <Link to={`/users/${userName}`}>
+        <Link to={`/users/${post.user.name}`}>
           <img
-            src={existingUser.img}
+            src={
+              userData
+                ? userData.image
+                : "https://source.unsplash.com/WNoLnJo7tS8"
+            }
             alt="n"
             className="h-12 w-12 rounded-full"
           />
@@ -42,14 +60,16 @@ export default function SinglePost({ post, singlePage }) {
           <div className="flex items-center justify-between">
             {/* name and username */}
             <Link
-              to={`/users/${userName}`}
+              to={`/users/${post.user.name}`}
               className="flex items-start -mt-[2px] mb-1 leading-3 flex-col"
             >
-              <h2 className="font-bold text-lg hover:underline">{name}</h2>
+              <h2 className="font-bold text-lg hover:underline">
+                {post.user.name}
+              </h2>
               <p className="text-gray-500 text-sm mt-[-4px]">
-                {userName}
+                {post.user.name}
                 <span> · </span>
-                {time}
+                {new Date(post.timestamp).toDateString()}
               </p>
             </Link>
 
@@ -60,17 +80,31 @@ export default function SinglePost({ post, singlePage }) {
               >
                 <FiMoreHorizontal fontSize={23} />
               </div>
-              <DotsOptions showMore={showMore} existingUser={existingUser} />
+              <DotsOptions showMore={showMore} existingUser={userData} />
             </div>
           </div>
-          {!video && <p className="text-gray-900 w-full">{description}</p>}
-          {img && (
+          <p className="text-gray-900 w-full">{post.content}</p>
+          {/* {post.media && (
             <div className="rounded-3xl overflow-hidden mt-3 w-fit">
               <img
-                src={img}
-                alt="78A265wPiO4"
+                src={post.media}
+                alt=""
                 className="max-h-[420px] max-w-[420px]"
               />
+            </div>
+          )} */}
+
+          {post.media && (
+            <div className="rounded-3xl overflow-hidden mt-3 w-fit">
+              {post.media ? (
+                <img
+                  src={post.media}
+                  alt=""
+                  className="max-h-[420px] max-w-[420px]"
+                />
+              ) : (
+                ""
+              )}
             </div>
           )}
         </header>
@@ -78,12 +112,16 @@ export default function SinglePost({ post, singlePage }) {
         {/* react comment share retweet in a post */}
         <ReactionIcons
           handlePopup={handlePopup}
+          handleCommentClick={handleCommentClick}
           post={post}
-          existingUser={existingUser}
+          existingUser={userData}
+          postCreator={post.user._id}
           showPopUp={showPopUp}
         />
         {/* comment input box */}
-        {singlePage && <CommentField />}
+        {showCommentInput && (
+          <CommentField postID={post._id} existingUser={userData} />
+        )}
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ router.get("/user/:uid", placesControllers.getPlacesByUserId);
 
 router.get("/bookmarks/:uid", placesControllers.getBookmarksByUserId);
 
-router.use(checkAuth);
+router.use(checkAuth.signin);
 
 router.post(
   "/",

@@ -156,9 +156,7 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res
-    .status(201)
-    .json({ userId: createdUser.id, email: createdUser.email, token: token });
+  res.status(201).json({ user: createdUser, token: token });
 };
 
 const login = async (req, res, next) => {
@@ -200,11 +198,7 @@ const login = async (req, res, next) => {
 
     let token;
     try {
-      token = jwt.sign(
-        { userId: existingUser._id, email: existingUser.email },
-        secretKey,
-        { expiresIn: "1h" }
-      );
+      token = jwt.sign({ user: existingUser }, secretKey, { expiresIn: "1h" });
     } catch (err) {
       const error = new HttpError(
         "Logging in failed, please try again later. This could be a problem with token verification",
@@ -214,8 +208,7 @@ const login = async (req, res, next) => {
     }
 
     res.json({
-      userId: existingUser._id,
-      email: existingUser.email,
+      user: existingUser,
       token: token,
     });
   } catch (err) {

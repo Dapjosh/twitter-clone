@@ -44,6 +44,13 @@ const postSchema = new Schema(
         text: String,
         created: { type: Date, default: Date.now() },
         postedBy: { type: mongoose.Schema.ObjectId, ref: "User" },
+        replies: [
+          {
+            text: String,
+            created: { type: Date, default: Date.now() },
+            postedBy: { type: mongoose.Schema.ObjectId, ref: "User" },
+          },
+        ],
       },
     ],
 

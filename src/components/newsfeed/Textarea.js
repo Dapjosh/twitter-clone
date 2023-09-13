@@ -4,19 +4,25 @@ import { Link } from "react-router-dom";
 import { BiImageAlt, BiVideo, CgMediaLive } from "../../constant/icons";
 
 export default function Textarea() {
-  const userID = localStorage.getItem("userID");
+  const storedUserData = localStorage.getItem("userData");
+
+  // Parse the JSON string back to an object
+  const userData = storedUserData ? JSON.parse(storedUserData) : null;
+
+  const token = localStorage.getItem("authToken");
   // const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
   let loggedInUser;
-  if (userID) {
-    loggedInUser = userID;
+  if (userData) {
+    loggedInUser = userData._id;
   }
 
   const getExistingUser = async (uid) => {
     try {
+      axios.defaults.headers.common["x-auth-token"] = `Bearer ${token}`;
       const response = await axios.get(
         `http://localhost:8000/api/users/${uid}`
       );
-      console.log(response.data);
+
       return response.data;
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -24,6 +30,7 @@ export default function Textarea() {
     }
   };
   const existingUser = getExistingUser(loggedInUser);
+  console.log(existingUser.id);
   const [file, setFile] = useState("");
   const [originalFileName, setOriginalFileName] = useState("");
   const [tweetText, setTweetText] = useState({
@@ -77,6 +84,7 @@ export default function Textarea() {
     }
 
     // Send a POST request to create the new tweet
+    axios.defaults.headers.common["x-auth-token"] = `Bearer ${token}`;
     axios
       .post("http://localhost:8000/api/tweet/new", formData, {
         headers: {
@@ -104,7 +112,7 @@ export default function Textarea() {
         <div>
           <img
             className="h-12 w-12 rounded-full"
-            src={existingUser.img}
+            src={existingUser.image}
             alt="user"
           />
         </div>

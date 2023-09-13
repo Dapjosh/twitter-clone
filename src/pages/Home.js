@@ -1,4 +1,5 @@
 import React from "react";
+
 import { NewsFeed } from "../components";
 
 export default function Home() {

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react/no-array-index-key */
 import React from "react";
 import { Link } from "react-router-dom";
@@ -12,11 +13,13 @@ import {
 export default function ReactionIcons({
   post,
   handlePopup,
+  handleCommentClick,
   existingUser,
   showPopUp,
+  postCreator,
 }) {
-  const { id, comments, retweet, react } = post || {};
-  const loggedInUser = "@Mohammadali003";
+  const { retweets, likes } = post || {};
+
   const icons = [
     {
       icon: (
@@ -25,7 +28,7 @@ export default function ReactionIcons({
           className="text-gray-900 transition-none group-hover:text-green-500"
         />
       ),
-      item: retweet,
+      item: retweets,
       color: "green",
     },
     {
@@ -35,22 +38,23 @@ export default function ReactionIcons({
           className="text-gray-900 transition-none group-hover:text-pink-500"
         />
       ),
-      item: react,
+      item: likes,
       color: "pink",
     },
   ];
 
   return (
     <div className="flex items-center justify-between pt-3 pr-2">
-      <Link to={`/posts/${id}`} className="flex items-center gap-2 group">
+      <Link to="#" className="flex items-center gap-2 group">
         <div className="h-8 w-8 grid place-content-center rounded-full">
           <FaRegComment
+            onClick={handleCommentClick}
             fontSize={18}
             className="text-gray-900 transition-none group-hover:text-blue-500"
           />
         </div>
         <p className="mt-[-2px] transition-none text-gray-900 group-hover:text-blue-500">
-          {comments}
+          {/* {comments} */}
         </p>
       </Link>
       {icons.map(({ icon, item, color }, i) => (
@@ -96,7 +100,7 @@ export default function ReactionIcons({
         </div>
       </div>
       {/* analytics button */}
-      {loggedInUser === existingUser.userName && (
+      {postCreator === existingUser._id && (
         <Link
           to="/analytics"
           className="flex items-center gap-2 group cursor-pointer"
