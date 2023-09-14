@@ -8,7 +8,7 @@ export default function CommentInput({ postID, existingUser }) {
     comment: "",
     media: null,
   });
-  const token = localStorage.getItem("authToken");
+  const token = sessionStorage.getItem("authToken");
   const inputRef = useRef(null);
   const textRef = useRef(null);
   const [isInputEmpty, setIsInputEmpty] = useState(true);

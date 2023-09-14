@@ -7,12 +7,12 @@ import PostSection from "./PostSection";
 export default function NewsFeed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const storedUserData = localStorage.getItem("userData");
+  const storedUserData = sessionStorage.getItem("userData");
 
   // Parse the JSON string back to an object
   const userData = storedUserData ? JSON.parse(storedUserData) : null;
 
-  const token = localStorage.getItem("authToken");
+  const token = sessionStorage.getItem("authToken");
   // const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
   let loggedInUser;
   if (userData) {

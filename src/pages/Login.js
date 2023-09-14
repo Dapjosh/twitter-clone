@@ -23,9 +23,9 @@ export default function Login({ onLogin }) {
       console.log("Login details" + userData);
       // Handle successful login, e.g., set authentication token in local storage
       onLogin(userData, token);
-      // localStorage.setItem("authToken", token);
-      // localStorage.setItem("userID", userId);
-      // localStorage.setItem("userEmail", email);
+      // sessionStorage.setItem("authToken", token);
+      // sessionStorage.setItem("userID", userId);
+      // sessionStorage.setItem("userEmail", email);
       // console.log(response.data); // The response from the backend
       navigate("/");
     } catch (error) {

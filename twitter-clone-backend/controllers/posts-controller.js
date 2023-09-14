@@ -8,6 +8,7 @@ const axios = require("axios").default;
 
 const Post = require("../models/post");
 const User = require("../models/user");
+const UserInteraction = require("../models/userInteration");
 
 const edenNLPKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGNmMzFjNTgtNGRlMC00MDc3LThhZDgtMmJlOWMwN2U4NGVhIiwidHlwZSI6ImFwaV90b2tlbiJ9.eHngTN0AVus2Qh8gUtRRq7T6UYyMdPWM403oVAeijKw";
@@ -89,10 +90,18 @@ const newTweet = async (req, res, next) => {
       passToNewTweet(keywordIds);
     };
     const passToNewTweet = async (keywordIds) => {
+      let mediaFile;
+      let mediaType;
+
+      if (req.files && req.files["media"]) {
+        mediaFile = req.files["media"][0].buffer; // Contains the uploaded file data
+        mediaType = mediaFile.mimetype;
+      } else {
+        // Handle the case when media is not provided
+        mediaFile = null;
+        mediaType = null;
+      }
       // Extract uploaded media files and determine their types (images or videos)
-      console.log(req.files["media"][0]);
-      const mediaFile = req.files["media"][0]; // Contains the uploaded file data
-      const mediaType = mediaFile.mimetype;
 
       // const media = mediaFiles.map((file) => ({
       //   data: file.buffer, // Store the file data in the database
@@ -103,7 +112,7 @@ const newTweet = async (req, res, next) => {
         user: userID,
         content: content,
         mediaType: mediaType,
-        media: mediaFile.buffer,
+        media: mediaFile,
         keywords: keywordIds,
       });
 
@@ -126,12 +135,39 @@ const listNewsFeed = async (req, res, next) => {
   const userID = req.params.uid;
   existingUser = await User.findOne({ _id: userID });
   try {
-    let posts = await Post.find({})
+    const userLikedPosts = await Post.find({ likes: userID }).exec();
+
+    const document = userLikedPosts.flatMap((post) => post.keywords);
+
+    const keywordTexts = document.map((keyword) =>
+      Object.values(keyword).filter((value) => typeof value === "string")
+    );
+
+    const keywordValues = keywordTexts
+      .flat()
+      .filter((value) => !["weight", "timestamp", "_id"].includes(value));
+
+    const userKeywords = [...new Set(keywordValues)];
+
+    const relatedPosts = await Post.find({
+      keywords: {
+        $elemMatch: {
+          $in: userKeywords.map((keyword) => new RegExp(keyword, "i")), // Case-insensitive search
+        },
+      },
+      _id: { $nin: userLikedPosts.map((post) => post._id) },
+    })
       .populate("comments.postedBy", "_id name")
       .populate("user", "_id name")
       .sort("-timestamp")
       .exec();
-    res.json({ posts: posts, user: existingUser });
+
+    // let posts = await Post.find({})
+    //   .populate("comments.postedBy", "_id name")
+    //   .populate("user", "_id name")
+    //   .sort("-timestamp")
+    //   .exec();
+    res.json({ posts: relatedPosts, user: existingUser });
   } catch (err) {
     const error = new HttpError("Error listing new posts " + err, 500);
     return next(error);
@@ -185,7 +221,64 @@ const listComments = async (req, res, next) => {
   }
 };
 
+const likePost = async (req, res) => {
+  const { postCreator, postID } = req.body;
+  const userID = postCreator;
+  try {
+    await Post.findByIdAndUpdate(
+      postID,
+      { $push: { likes: userID } },
+      { new: true }
+    );
+
+    const like = new UserInteraction({
+      user: userID,
+      tweet: postID,
+      interactionType: "likes",
+    });
+
+    await like.save();
+    res.json({ message: "Post liked successfully" });
+  } catch (error) {
+    console.error("Error liking post:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while liking the post" });
+  }
+};
+
+// Unlike a post
+const unlikePost = async (req, res) => {
+  const postId = req.params.postId;
+
+  try {
+    await Like.deleteOne({ user: req.user.id, post: postId });
+    res.json({ message: "Post unliked successfully" });
+  } catch (error) {
+    console.error("Error unliking post:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while unliking the post" });
+  }
+};
+
+// Get likes for a post
+const getLikesForPost = async (req, res) => {
+  const postID = req.params.pid;
+
+  try {
+    const likes = await Post.findById(postID).populate("likes", "_id name");
+    res.json(likes);
+  } catch (error) {
+    console.error("Error fetching likes:", error);
+    res.status(500).json({ message: "An error occurred while fetching likes" });
+  }
+};
+
 exports.newTweet = newTweet;
 exports.comment = comment;
 exports.listNewsFeed = listNewsFeed;
 exports.listComments = listComments;
+exports.likePost = likePost;
+exports.unlikePost = unlikePost;
+exports.getLikesForPost = getLikesForPost;

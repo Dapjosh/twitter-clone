@@ -46,4 +46,20 @@ router.get(
   postsController.listComments
 );
 
+router.post("/posts/likes", verifyAuth.requireSignin, postsController.likePost);
+
+// Unlike a post
+router.delete(
+  "/posts/likes/:pid",
+  verifyAuth.requireSignin,
+  postsController.unlikePost
+);
+
+// Get likes for a post
+router.get(
+  "/posts/likes/:pid",
+  verifyAuth.requireSignin,
+  postsController.getLikesForPost
+);
+
 module.exports = router;

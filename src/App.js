@@ -32,7 +32,7 @@ const Wrapper = ({ children }) => {
 function App() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const authToken = localStorage.getItem("authToken");
+  const authToken = sessionStorage.getItem("authToken");
 
   useEffect(() => {
     // Check if the user is authenticated (e.g., by verifying the token)
@@ -44,8 +44,8 @@ function App() {
   }, []);
 
   const handleLogin = (userData, token) => {
-    localStorage.setItem("authToken", token);
-    localStorage.setItem("userData", JSON.stringify(userData));
+    sessionStorage.setItem("authToken", token);
+    sessionStorage.setItem("userData", JSON.stringify(userData));
 
     setIsLoggedIn(true);
     console.log(isLoggedIn);

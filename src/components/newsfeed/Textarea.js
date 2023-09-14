@@ -4,12 +4,12 @@ import { Link } from "react-router-dom";
 import { BiImageAlt, BiVideo, CgMediaLive } from "../../constant/icons";
 
 export default function Textarea() {
-  const storedUserData = localStorage.getItem("userData");
+  const storedUserData = sessionStorage.getItem("userData");
 
   // Parse the JSON string back to an object
   const userData = storedUserData ? JSON.parse(storedUserData) : null;
 
-  const token = localStorage.getItem("authToken");
+  const token = sessionStorage.getItem("authToken");
   // const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
   let loggedInUser;
   if (userData) {

@@ -10,7 +10,7 @@ export default function Comments({ postID }) {
   const [showMore, setShowMore] = useState(false);
   const [toggleReply, setToggleReply] = useState(false);
   const [comments, setComments] = useState([]);
-  const token = localStorage.getItem("authToken");
+  const token = sessionStorage.getItem("authToken");
 
   const handleMore = () => {
     setShowMore(() => !showMore);

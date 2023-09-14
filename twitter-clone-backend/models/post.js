@@ -30,7 +30,7 @@ const postSchema = new Schema(
     likes: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "Like",
+        ref: "User",
       },
     ],
     retweets: [

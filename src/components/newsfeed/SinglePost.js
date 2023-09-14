@@ -10,7 +10,7 @@ import ReactionIcons from "./ReactionIcons";
 export default function SinglePost({ post }) {
   console.log(post);
   // const { name, img, userName, description, time, video } = post || {};
-  const storedUserData = localStorage.getItem("userData");
+  const storedUserData = sessionStorage.getItem("userData");
 
   // Parse the JSON string back to an object
   const userData = storedUserData ? JSON.parse(storedUserData) : null;

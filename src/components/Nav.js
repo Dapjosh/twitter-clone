@@ -17,14 +17,14 @@ import NotificationDropDown from "./notifications/DropDown/NotificationDropDown"
 
 export default function Nav({ isLoggedIn, handleLogOut }) {
   console.log(isLoggedIn);
-  const storedUserData = localStorage.getItem("userData");
+  const storedUserData = sessionStorage.getItem("userData");
   console.log(storedUserData);
 
   // Parse the JSON string back to an object
 
   const userData = storedUserData ? JSON.parse(storedUserData) : null;
 
-  const token = localStorage.getItem("authToken");
+  const token = sessionStorage.getItem("authToken");
 
   let loggedInUser;
   if (userData) {

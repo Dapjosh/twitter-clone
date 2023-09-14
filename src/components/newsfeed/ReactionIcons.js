@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-array-index-key */
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   AiOutlineHeart,
@@ -18,7 +19,43 @@ export default function ReactionIcons({
   showPopUp,
   postCreator,
 }) {
-  const { retweets, likes } = post || {};
+  const { _id, retweets, likes } = post || {};
+
+  const postID = _id;
+  const token = sessionStorage.getItem("authToken");
+
+  const [isLiked, setIsLiked] = useState(false);
+  useEffect(() => {
+    // Check if the user has already liked the post
+    const checkLikeStatus = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/tweet/posts/likes/${postID}`
+        );
+        const likes = response.data;
+        const userLiked = likes.some((like) => like.likes._id === postCreator);
+        console.log(userLiked);
+        setIsLiked(userLiked);
+      } catch (error) {
+        console.error("Error checking like status:", error);
+      }
+    };
+
+    checkLikeStatus();
+  }, [postID, postCreator]);
+
+  const handleLike = async () => {
+    try {
+      axios.defaults.headers.common["x-auth-token"] = `Bearer ${token}`;
+      await axios.post("http://localhost:8000/api/tweet/posts/likes", {
+        postCreator,
+        postID,
+      });
+      setIsLiked(true);
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
 
   const icons = [
     {
@@ -34,12 +71,17 @@ export default function ReactionIcons({
     {
       icon: (
         <AiOutlineHeart
+          onClick={handleLike}
           fontSize={18}
-          className="text-gray-900 transition-none group-hover:text-pink-500"
+          className={`${isLiked ? "pink" : "text-gray-900"}${
+            isLiked
+              ? " transition-none group-hover:text-pink-500"
+              : " transition-none group-hover:text-pink-500"
+          }`}
         />
       ),
-      item: likes,
-      color: "pink",
+      item: likes.length > 0 ? likes.length : "",
+      color: isLiked ? "pink" : "gray",
     },
   ];
 
