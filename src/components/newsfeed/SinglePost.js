@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-nested-ternary */
 import React, { useState } from "react";
@@ -35,9 +36,6 @@ export default function SinglePost({ post }) {
     setShowMore(false); // Close more options when clicking comment
   };
 
-  // // const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState("");
-
-  console.log("The real user " + userData._id);
   return (
     <div className="flex items-start p-4 gap-2">
       {/* profile picture of all users */}
@@ -45,9 +43,9 @@ export default function SinglePost({ post }) {
         <Link to={`/users/${post.user.name}`}>
           <img
             src={
-              userData
+              userData.image
                 ? userData.image
-                : "https://source.unsplash.com/WNoLnJo7tS8"
+                : process.env.PUBLIC_URL + "/assets/avatar.png"
             }
             alt="n"
             className="h-12 w-12 rounded-full"
@@ -84,27 +82,13 @@ export default function SinglePost({ post }) {
             </div>
           </div>
           <p className="text-gray-900 w-full">{post.content}</p>
-          {/* {post.media && (
+          {post.media && (
             <div className="rounded-3xl overflow-hidden mt-3 w-fit">
               <img
-                src={post.media}
+                src={`http://localhost:8000/uploads/images/${post.media[0]}`}
                 alt=""
                 className="max-h-[420px] max-w-[420px]"
               />
-            </div>
-          )} */}
-
-          {post.media && (
-            <div className="rounded-3xl overflow-hidden mt-3 w-fit">
-              {post.media ? (
-                <img
-                  src={post.media}
-                  alt=""
-                  className="max-h-[420px] max-w-[420px]"
-                />
-              ) : (
-                ""
-              )}
             </div>
           )}
         </header>

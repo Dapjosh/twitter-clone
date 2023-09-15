@@ -68,7 +68,7 @@ const postSchema = new Schema(
     ],
     keywords: [
       {
-        text: String,
+        content: { type: String },
         weight: { type: Number, default: 0 },
         timestamp: { type: Date, default: Date.now() },
       },

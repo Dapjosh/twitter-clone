@@ -1,6 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
 import Nav from "./components/Nav";
 import Discover from "./pages/Discover";
@@ -57,8 +63,8 @@ function App() {
       .post("http://localhost:8000/api/users/logout")
       .then((response) => {
         console.log(response.data.message);
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("userData");
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("userData");
         setIsLoggedIn(false);
         navigate("/login");
         // Redirect the user or perform other actions
@@ -74,54 +80,116 @@ function App() {
       <Wrapper>
         <Routes>
           <Route
-            path="/"
             index
-            element={<PrivateRoute path="/" element={<Home />} />}
+            element={
+              <PrivateRoute
+                path="/"
+                element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
+              />
+            }
           />
           <Route
-            path="/posts/:id"
-            element={<PrivateRoute path="/" element={<SinglePostView />} />}
+            element={
+              <PrivateRoute
+                path="/posts/:id"
+                element={
+                  isLoggedIn ? <SinglePostView /> : <Navigate to="/login" />
+                }
+              />
+            }
           />
           <Route
-            path="/studio/:id"
-            element={<PrivateRoute path="/" element={<VideoStudioPage />} />}
+            element={
+              <PrivateRoute
+                path="/studio/:id"
+                element={
+                  isLoggedIn ? <VideoStudioPage /> : <Navigate to="/login" />
+                }
+              />
+            }
           />
           <Route
-            path="/settings"
-            element={<PrivateRoute path="/" element={<Settings />} />}
+            element={
+              <PrivateRoute
+                path="/settings"
+                element={isLoggedIn ? <Settings /> : <Navigate to="/login" />}
+              />
+            }
           />
           <Route
-            path="/account"
-            element={<PrivateRoute path="/" element={<Profile />} />}
+            element={
+              <PrivateRoute
+                path="/account"
+                element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
+              />
+            }
           />
           <Route
-            path="/users/:id"
-            element={<PrivateRoute path="/" element={<Users />} />}
+            element={
+              <PrivateRoute
+                path="/users/:id"
+                element={isLoggedIn ? <Users /> : <Navigate to="/login" />}
+              />
+            }
           />
           <Route
-            path="/discover"
-            element={<PrivateRoute path="/" element={<Discover />} />}
+            element={
+              <PrivateRoute
+                path="/discover"
+                element={isLoggedIn ? <Discover /> : <Navigate to="/login" />}
+              />
+            }
           />
           <Route
-            path="/notifications"
-            element={<PrivateRoute path="/" element={<Notifications />} />}
+            element={
+              <PrivateRoute
+                path="/notifications"
+                element={
+                  isLoggedIn ? <Notifications /> : <Navigate to="/login" />
+                }
+              />
+            }
           />
           <Route
-            path="/subscription"
-            element={<PrivateRoute path="/" element={<Subscriptions />} />}
+            element={
+              <PrivateRoute
+                path="/subscription"
+                element={
+                  isLoggedIn ? <Subscriptions /> : <Navigate to="/login" />
+                }
+              />
+            }
           />
           <Route
-            path="/messages"
-            element={<PrivateRoute path="/" element={<MessagesPage />} />}
+            element={
+              <PrivateRoute
+                path="/messages"
+                element={
+                  isLoggedIn ? <MessagesPage /> : <Navigate to="/login" />
+                }
+              />
+            }
           />
           <Route
-            path="/analytics"
-            element={<PrivateRoute path="/" element={<PostAnalytics />} />}
+            element={
+              <PrivateRoute
+                path="/analytics"
+                element={
+                  isLoggedIn ? <PostAnalytics /> : <Navigate to="/login" />
+                }
+              />
+            }
           />
 
           <Route
-            path="/edit"
-            element={<PrivateRoute path="/" element={<EditProfilePage />} />}
+            element={
+              <PrivateRoute
+                path="/edit"
+                element={
+                  isLoggedIn ? <EditProfilePage /> : <Navigate to="/login" />
+                }
+              />
+            }
           />
 
           <Route path="/search" element={<Search />} />

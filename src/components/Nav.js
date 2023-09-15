@@ -16,7 +16,6 @@ import {
 import NotificationDropDown from "./notifications/DropDown/NotificationDropDown";
 
 export default function Nav({ isLoggedIn, handleLogOut }) {
-  console.log(isLoggedIn);
   const storedUserData = sessionStorage.getItem("userData");
   console.log(storedUserData);
 
@@ -30,7 +29,6 @@ export default function Nav({ isLoggedIn, handleLogOut }) {
   if (userData) {
     loggedInUser = userData._id;
   }
-  console.log("The logged user " + loggedInUser);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -136,7 +134,11 @@ export default function Nav({ isLoggedIn, handleLogOut }) {
               <div className="cursor-pointer relative" onClick={handleClick}>
                 <img
                   className="h-[38px] w-[38px] rounded-full"
-                  src={existingUser.img}
+                  src={
+                    existingUser.image
+                      ? existingUser.image
+                      : process.env.PUBLIC_URL + "/assets/avatar.png"
+                  }
                   alt="user"
                 />
                 <div

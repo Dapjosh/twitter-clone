@@ -16,7 +16,26 @@ const userSchema = new Schema(
     followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: Schema.Types.ObjectId, ref: "User" }],
     places: [{ type: mongoose.Types.ObjectId, required: false, ref: "Place" }],
-    location: { type: String, required: false },
+    location: {
+      country: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+      },
+      state: {
+        type: String,
+      },
+      coordinates: {
+        type: {
+          type: String,
+          enum: ["Point"], // For geospatial data (longitude and latitude)
+          default: "Point",
+        },
+        coordinates: [Number], // [longitude, latitude]
+      },
+    },
     languagePreferences: [String],
     bookmarks: [{ type: mongoose.Types.ObjectId, required: false }],
     verificationDetails: {

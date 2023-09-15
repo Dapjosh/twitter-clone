@@ -16,11 +16,7 @@ export const login = async (credentials) => {
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem("token");
-};
-
 export const isAuthenticated = () => {
-  const token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("authToken");
   return !!token;
 };

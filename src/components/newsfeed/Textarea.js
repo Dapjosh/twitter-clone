@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import axios from "axios";
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -16,21 +17,6 @@ export default function Textarea() {
     loggedInUser = userData._id;
   }
 
-  const getExistingUser = async (uid) => {
-    try {
-      axios.defaults.headers.common["x-auth-token"] = `Bearer ${token}`;
-      const response = await axios.get(
-        `http://localhost:8000/api/users/${uid}`
-      );
-
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      return null;
-    }
-  };
-  const existingUser = getExistingUser(loggedInUser);
-  console.log(existingUser.id);
   const [file, setFile] = useState("");
   const [originalFileName, setOriginalFileName] = useState("");
   const [tweetText, setTweetText] = useState({
@@ -43,7 +29,7 @@ export default function Textarea() {
 
   const handleImgfiles = (e) => {
     const selectedFile = e.target.files[0];
-    console.log(selectedFile);
+
     setOriginalFileName(selectedFile);
     if (!selectedFile) return;
 
@@ -69,7 +55,7 @@ export default function Textarea() {
   };
 
   const handleTweetSubmit = () => {
-    if (tweetText.newTweet.trim() === "") {
+    if (tweetText.newTweet.trim() === "" && !file) {
       // Don't allow submitting empty tweets
       return;
     }
@@ -79,6 +65,7 @@ export default function Textarea() {
     formData.append("userID", loggedInUser);
 
     if (file) {
+      console.log(originalFileName);
       // Append the selected image file to the FormData object
       formData.append("media", originalFileName);
     }
@@ -112,11 +99,15 @@ export default function Textarea() {
         <div>
           <img
             className="h-12 w-12 rounded-full"
-            src={existingUser.image}
+            src={
+              userData.image
+                ? userData.image
+                : process.env.PUBLIC_URL + "/assets/avatar.png"
+            }
             alt="user"
           />
         </div>
-        <form className="flex-1 mt-[2px]">
+        <form encType="multipart/form-data" className="flex-1 mt-[2px]">
           <textarea
             rows="1"
             id="newTweet"
@@ -142,11 +133,12 @@ export default function Textarea() {
           <div className="flex items-center justify-between">
             <div className="flex items-center pt-3 -ml-2">
               <div className="w-[34px] h-[34px] grid place-content-center hover:bg-gray-100 rounded-full">
-                <label htmlFor="file" className="cursor-pointer">
+                <label htmlFor="media" className="cursor-pointer">
                   <BiImageAlt fontSize={22} />
                   <input
                     type="file"
-                    id="file"
+                    id="media"
+                    name="media"
                     accept="image/*"
                     ref={inputRef}
                     onChange={handleImgfiles}
