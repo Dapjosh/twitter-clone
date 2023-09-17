@@ -7,7 +7,6 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import PrivateRoute from "./PrivateRoute";
 import Nav from "./components/Nav";
 import Discover from "./pages/Discover";
 import EditProfilePage from "./pages/EditProfilePage";
@@ -46,6 +45,8 @@ function App() {
     if (authToken) {
       setIsLoggedIn(true);
       console.log("The token is " + authToken);
+    } else {
+      setIsLoggedIn(false);
     }
   }, []);
 
@@ -81,114 +82,111 @@ function App() {
         <Routes>
           <Route
             index
+            element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/posts/:id"
+            element={isLoggedIn ? <SinglePostView /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/studio/:id"
             element={
-              <PrivateRoute
-                path="/"
-                element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
-              />
+              isLoggedIn ? (
+                <VideoStudioPage isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/settings"
             element={
-              <PrivateRoute
-                path="/posts/:id"
-                element={
-                  isLoggedIn ? <SinglePostView /> : <Navigate to="/login" />
-                }
-              />
+              isLoggedIn ? (
+                <Settings isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/account"
             element={
-              <PrivateRoute
-                path="/studio/:id"
-                element={
-                  isLoggedIn ? <VideoStudioPage /> : <Navigate to="/login" />
-                }
-              />
+              isLoggedIn ? (
+                <Profile isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/users/:id"
             element={
-              <PrivateRoute
-                path="/settings"
-                element={isLoggedIn ? <Settings /> : <Navigate to="/login" />}
-              />
+              isLoggedIn ? (
+                <Users isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/discover"
             element={
-              <PrivateRoute
-                path="/account"
-                element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
-              />
+              isLoggedIn ? (
+                <Discover isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/notifications"
             element={
-              <PrivateRoute
-                path="/users/:id"
-                element={isLoggedIn ? <Users /> : <Navigate to="/login" />}
-              />
+              isLoggedIn ? (
+                <Notifications isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/subscription"
             element={
-              <PrivateRoute
-                path="/discover"
-                element={isLoggedIn ? <Discover /> : <Navigate to="/login" />}
-              />
+              isLoggedIn ? (
+                <Subscriptions isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/messages"
             element={
-              <PrivateRoute
-                path="/notifications"
-                element={
-                  isLoggedIn ? <Notifications /> : <Navigate to="/login" />
-                }
-              />
+              isLoggedIn ? (
+                <MessagesPage isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
+            path="/analytics"
             element={
-              <PrivateRoute
-                path="/subscription"
-                element={
-                  isLoggedIn ? <Subscriptions /> : <Navigate to="/login" />
-                }
-              />
-            }
-          />
-          <Route
-            element={
-              <PrivateRoute
-                path="/messages"
-                element={
-                  isLoggedIn ? <MessagesPage /> : <Navigate to="/login" />
-                }
-              />
-            }
-          />
-          <Route
-            element={
-              <PrivateRoute
-                path="/analytics"
-                element={
-                  isLoggedIn ? <PostAnalytics /> : <Navigate to="/login" />
-                }
-              />
+              isLoggedIn ? (
+                <PostAnalytics isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
 
           <Route
+            path="/edit"
             element={
-              <PrivateRoute
-                path="/edit"
-                element={
-                  isLoggedIn ? <EditProfilePage /> : <Navigate to="/login" />
-                }
-              />
+              isLoggedIn ? (
+                <EditProfilePage isLoggedIn={isLoggedIn} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
 

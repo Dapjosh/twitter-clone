@@ -62,4 +62,12 @@ router.get(
   postsController.getLikesForPost
 );
 
+router.get("/posts/search", verifyAuth.requireSignin, postsController.search);
+
+router.get(
+  "/posts/search/suggestions",
+  verifyAuth.requireSignin,
+  postsController.search
+);
+
 module.exports = router;

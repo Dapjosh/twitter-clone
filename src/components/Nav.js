@@ -3,37 +3,45 @@
 
 import axios from "axios";
 import React, { useState } from "react";
+import Autosuggest from "react-autosuggest";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  AiOutlineSearch,
   AiOutlineSetting,
   BiDollarCircle,
   MdOutlineAccountBox,
   MdOutlineLogin,
   MdSlowMotionVideo,
 } from "../constant/icons";
-
 import NotificationDropDown from "./notifications/DropDown/NotificationDropDown";
 
 export default function Nav({ isLoggedIn, handleLogOut }) {
-  const storedUserData = sessionStorage.getItem("userData");
-  console.log(storedUserData);
-
-  // Parse the JSON string back to an object
-
-  const userData = storedUserData ? JSON.parse(storedUserData) : null;
-
-  const token = sessionStorage.getItem("authToken");
-
   let loggedInUser;
-  if (userData) {
-    loggedInUser = userData._id;
+  let token;
+  let userData;
+  if (isLoggedIn) {
+    const storedUserData = sessionStorage.getItem("userData");
+    console.log(storedUserData);
+
+    // Parse the JSON string back to an object
+
+    userData = storedUserData ? JSON.parse(storedUserData) : null;
+
+    token = sessionStorage.getItem("authToken");
+
+    if (userData) {
+      loggedInUser = userData._id;
+    }
   }
 
   const navigate = useNavigate();
   const location = useLocation();
   const [dropDown, setDropDown] = useState(false);
-  const [search, setSearch] = useState("");
+  // const [search, setSearch] = useState("");
+  // const [results, setResults] = useState([]);
+  const [search, setSearch] = useState({
+    value: "",
+    suggestions: [],
+  });
 
   const watchPage =
     location.pathname === `/watch` ||
@@ -43,11 +51,40 @@ export default function Nav({ isLoggedIn, handleLogOut }) {
     setDropDown(() => !dropDown);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate(`/search?q=${search}`);
-    setSearch("");
+  const getSuggestions = async (value) => {
+    // setSearch({ search, [e.target.name]: e.target.value });
+    // Fetch auto-suggestions here
+    axios
+      .get(
+        `http://localhost:8000/api/tweet/posts/search/suggestions?query=${value}`
+      )
+      .then((response) => {
+        setSearch({ value, suggestions: response.data });
+      });
   };
+  const handleOnChange = (event, { newValue }) => {
+    setSearch({ ...search, value: newValue });
+  };
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   axios
+  //     .get(`http://localhost:8000/api/tweet/posts/search?query=${query}`)
+  //     .then((response) => {
+  //       setResults(response.data);
+  //     });
+  //   navigate(`/search?q=${search}`);
+  //   setSearch("");
+  // };
+
+  const renderSuggestion = (suggestion) => (
+    <div>{suggestion.user.name}</div> // Customize based on your API response
+  );
+  const onSuggestionSelected = (event, { suggestion }) => {
+    event.preventDefault();
+    nav(`/${suggestion.user.name}`);
+  };
+
   const navItems = [
     { id: 1, icon: <MdOutlineAccountBox fontSize={24} />, title: "Account" },
     {
@@ -65,23 +102,54 @@ export default function Nav({ isLoggedIn, handleLogOut }) {
   ];
 
   //const existingUser = users.find((u) => u.userName === loggedInUser);
+  let existingUser;
+  if (isLoggedIn) {
+    const getExistingUser = async (uid) => {
+      try {
+        axios.defaults.headers.common["x-auth-token"] = `Bearer ${token}`;
+        const response = await axios.get(
+          `http://localhost:8000/api/users/${uid}`
+        );
+        console.log(response.data);
+        return response.data;
+      } catch (error) {
+        if ((error && error.status === 401) || error.status === 403) {
+          // Token expired; clear sessionStorage and log the user out
+          sessionStorage.removeItem("authToken");
+          sessionStorage.removeItem("userData");
+          navigate("/login");
+        } else {
+          console.error("Error fetching user data:", error);
+        }
 
-  const getExistingUser = async (uid) => {
-    try {
-      axios.defaults.headers.common["x-auth-token"] = `Bearer ${token}`;
-      const response = await axios.get(
-        `http://localhost:8000/api/users/${uid}`
-      );
-      console.log(response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      return null;
-    }
+        return null;
+      }
+    };
+
+    existingUser = getExistingUser(loggedInUser);
+    console.log("The existing user " + loggedInUser);
+  }
+  const theme = {
+    container: {
+      position: "relative",
+    },
+    suggestionsContainer: {
+      position: "absolute",
+      top: "100%",
+      left: 0,
+      width: "100%",
+      zIndex: 1000,
+      backgroundColor: "white",
+      border: "1px solid #ccc",
+      maxHeight: "200px",
+      overflowY: "auto",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+    suggestion: {
+      padding: "8px 12px",
+      cursor: "pointer",
+    },
   };
-
-  const existingUser = getExistingUser(loggedInUser);
-  console.log("The existing user " + loggedInUser);
 
   return (
     <div
@@ -113,7 +181,28 @@ export default function Nav({ isLoggedIn, handleLogOut }) {
           </ul>
         </div>
         <div className="flex items-center gap-2">
-          <form
+          <Autosuggest
+            className="flex items-center bg-gray-100 rounded-3xl py-2 px-4"
+            suggestions={search.suggestions}
+            onSuggestionsFetchRequested={({ value }) => getSuggestions(value)}
+            onSuggestionsClearRequested={() =>
+              setSearch({ ...search, suggestions: [] })
+            }
+            getSuggestionValue={(suggestion) => suggestion.user.name}
+            renderSuggestion={renderSuggestion}
+            onSuggestionSelected={onSuggestionSelected}
+            inputProps={{
+              placeholder: "Search..",
+              value: search.value,
+              onChange: handleOnChange,
+              onBlur: () => setSearch({ ...search, value: "" }),
+              className:
+                "w-28 transition-all duration-500 ml-3 outline-none focus:outline-none bg-gray-100 text-md placeholder:text-black",
+            }}
+            theme={theme}
+          />
+
+          {/* <form
             onSubmit={handleSubmit}
             className="flex items-center bg-gray-100 rounded-3xl py-2 px-4"
           >
@@ -123,11 +212,13 @@ export default function Nav({ isLoggedIn, handleLogOut }) {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleInputChange}
               className="w-28 transition-all duration-500 ml-3 outline-none focus:outline-none bg-gray-100 text-md placeholder:text-black"
               placeholder="Search"
             />
-          </form>
+          </form> */}
+          {/* <AutoSuggestions suggestions={suggestions} />
+          <SearchResults results={results} /> */}
           {isLoggedIn ? (
             <>
               <NotificationDropDown watchPage={watchPage} />

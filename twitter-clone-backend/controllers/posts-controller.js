@@ -126,8 +126,8 @@ const listNewsFeed = async (req, res, next) => {
             },
           },
           {
-            "user.location.coordinates.coordinates": {
-              $eq: existingUser.location.coordinates.coordinates,
+            "user.places": {
+              $eq: existingUser.places,
             },
           },
         ],
@@ -245,6 +245,36 @@ const getLikesForPost = async (req, res) => {
   }
 };
 
+const search = async (req, res) => {
+  try {
+    const query = req.query.query;
+    const posts = await Post.find({
+      content: { $regex: query, $options: "i" },
+    })
+      .populate("user", "_id name image")
+      .sort({
+        timestamp: -1,
+      });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const suggestions = async (req, res) => {
+  try {
+    const query = req.query.query;
+    // Implement auto-suggestions logic here
+    // Example: You can search for keywords that match the query and return them as suggestions
+    const suggestions = await Post.distinct("keywords.content", {
+      "keywords.content": new RegExp(query, "i"),
+    });
+    res.json(suggestions);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.newTweet = newTweet;
 exports.comment = comment;
 exports.listNewsFeed = listNewsFeed;
@@ -252,3 +282,5 @@ exports.listComments = listComments;
 exports.likePost = likePost;
 exports.unlikePost = unlikePost;
 exports.getLikesForPost = getLikesForPost;
+exports.search = search;
+exports.suggestions = suggestions;

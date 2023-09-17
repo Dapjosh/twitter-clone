@@ -13,12 +13,20 @@ const signin = (req, res, next) => {
   }
   try {
     const token = req.header("x-auth-token").split(" ")[1];
-    console.log(token);
+
     if (!token) {
       throw new Error("Authentication failed!");
     }
     const decodedToken = jwt.verify(token, secretKey);
-    console.log(decodedToken);
+    if (decodedToken.exp <= Date.now() / 1000) {
+      // Token has expired; log the user out
+      // Clear sessionStorage and return an error
+      sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("userData");
+      return res
+        .status(401)
+        .json({ message: "Token expired. Please log in again." });
+    }
     req.user = decodedToken.user;
     next();
   } catch (err) {

@@ -1,13 +1,14 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import {
-    AiOutlineCloudUpload,
-    BsBarChart,
-    CgMediaLive,
-    CiStreamOn,
-    MdContentPaste,
-    MdMonitor,
+  AiOutlineCloudUpload,
+  BsBarChart,
+  CgMediaLive,
+  CiStreamOn,
+  MdContentPaste,
+  MdMonitor,
 } from "../../constant/icons";
 import GoLive from "./GoLive";
 import ManagingVideos from "./ManagingVideos";
@@ -16,7 +17,7 @@ import Stream from "./Stream/Stream";
 import UploadVideo from "./UploadVideo";
 import Analytics from "./analytics/Analytics";
 
-export default function Studio() {
+export default function Studio({ isLoggedIn }) {
   const location = useLocation();
   const studioItems = [
     { path: "go-live", title: "Go Live", icon: <CgMediaLive fontSize={23} /> },
@@ -25,7 +26,11 @@ export default function Studio() {
       title: "Upload Video",
       icon: <AiOutlineCloudUpload fontSize={23} />,
     },
-    { path: "analytics", title: "Analytics", icon: <BsBarChart fontSize={23} /> },
+    {
+      path: "analytics",
+      title: "Analytics",
+      icon: <BsBarChart fontSize={23} />,
+    },
     {
       path: "monetization",
       title: "Monetized Content",
@@ -43,7 +48,7 @@ export default function Studio() {
       content = <Stream />;
       break;
     case "/studio/upload-video":
-      content = <UploadVideo />;
+      content = isLoggedIn ? <UploadVideo /> : <Navigate to="/login" />;
       break;
     case "/studio/go-live":
       content = <GoLive />;
@@ -59,14 +64,23 @@ export default function Studio() {
   }
 
   return (
-    <div className={`${location.pathname === "/studio/stream-manager" && "bg-[#161616] min-h-[calc(100vh_-_76px)]"}`}>
+    <div
+      className={`${
+        location.pathname === "/studio/stream-manager" &&
+        "bg-[#161616] min-h-[calc(100vh_-_76px)]"
+      }`}
+    >
       <div className="max-w-[1340px] mx-auto flex items-start">
         <div className="py-9 pl-9 basis-[300px]">
           <Link
             to="/studio/content"
             className={`flex items-center gap-3 py-2 px-3 mb-1 rounded-sm cursor-pointer hover:bg-gray-50 ${
               location.pathname === "/studio/content" ? "bg-gray-100" : ""
-            } ${location.pathname === "/studio/stream-manager" ? "text-white hover:bg-g" : ""}`}
+            } ${
+              location.pathname === "/studio/stream-manager"
+                ? "text-white hover:bg-g"
+                : ""
+            }`}
           >
             <div>
               <MdContentPaste fontSize={23} />
@@ -76,7 +90,9 @@ export default function Studio() {
           <Link
             to="/studio/stream-manager"
             className={`flex items-center gap-3 py-2 px-3 mb-1 rounded-sm cursor-pointer hover:bg-gray-50 ${
-              location.pathname === "/studio/stream-manager" ? "bg-[#1f1f1f] hover:bg-g text-white" : ""
+              location.pathname === "/studio/stream-manager"
+                ? "bg-[#1f1f1f] hover:bg-g text-white"
+                : ""
             }`}
           >
             <div>
@@ -89,8 +105,14 @@ export default function Studio() {
               to={`/studio/${item.path}`}
               key={item.path}
               className={`flex items-center gap-3 py-2 px-3 mb-1 rounded-sm cursor-pointer hover:bg-gray-50 ${
-                location.pathname === `/studio/${item.path}` ? "bg-gray-100" : ""
-              } ${location.pathname === "/studio/stream-manager" ? "text-white hover:bg-g" : ""}`}
+                location.pathname === `/studio/${item.path}`
+                  ? "bg-gray-100"
+                  : ""
+              } ${
+                location.pathname === "/studio/stream-manager"
+                  ? "text-white hover:bg-g"
+                  : ""
+              }`}
             >
               <div>{item.icon}</div>
               {item.title}

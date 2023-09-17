@@ -9,7 +9,6 @@ import DotsOptions from "./DotsOptions";
 import ReactionIcons from "./ReactionIcons";
 
 export default function SinglePost({ post }) {
-  console.log(post);
   // const { name, img, userName, description, time, video } = post || {};
   const storedUserData = sessionStorage.getItem("userData");
 

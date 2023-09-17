@@ -34,27 +34,27 @@ export default function Register() {
     // Validate the user input
     if (!inputValue.fullName) {
       toast.error("Please enter your full name", {
-        position: "bottom-left",
-        width: "50px",
-        height: "50px",
+        position: "top-left",
+        width: "20px",
+        height: "20px",
       });
       return;
     }
 
     if (!inputValue.email) {
       toast.error("Please enter your email address", {
-        position: "bottom-left",
-        width: "50px",
-        height: "50px",
+        position: "top-left",
+        width: "20px",
+        height: "20px",
       });
       return;
     }
 
     if (!inputValue.password) {
       toast.error("Please enter your password", {
-        position: "bottom-left",
-        width: "50px",
-        height: "50px",
+        position: "top-left",
+        width: "20px",
+        height: "20px",
       });
       return;
     }
@@ -74,9 +74,7 @@ export default function Register() {
       const { success, message } = data;
       if (success) {
         toast.success(message);
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
+        navigate("/login");
       } else {
         toast.error(message);
       }

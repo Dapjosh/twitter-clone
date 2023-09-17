@@ -16,14 +16,25 @@ export default function UploadVideo() {
             >
               <div className="mt-7">
                 <BiVideo fontSize={25} className="mx-auto text-blue-400" />
-                <p className="font-semibold text-sm text-blue-400">Upload Video</p>
+                <p className="font-semibold text-sm text-blue-400">
+                  Upload Video
+                </p>
               </div>
-              <input type="file" id="file" className="opacity-0 hidden h-[.1px] w-[.1px]" />
+              <input
+                type="file"
+                id="file"
+                className="opacity-0 hidden h-[.1px] w-[.1px]"
+              />
             </label>
           </div>
           <div className="rounded-md col-span-1 -mt-2">
             <div className="border p-2 max-w-fit rounded-md mt-2">
-              <video width="180px" height="100%" className="rounded-t-md" controls>
+              <video
+                width="180px"
+                height="100%"
+                className="rounded-t-md"
+                controls
+              >
                 <track kind="captions" />
                 <source src={videoFile} type="video/mp4" />
               </video>
@@ -37,15 +48,26 @@ export default function UploadVideo() {
             >
               <div className="mt-8">
                 <BiImageAlt fontSize={22} className="mx-auto text-blue-400" />
-                <p className="font-semibold text-xs text-blue-400">Upload Thumbnail</p>
+                <p className="font-semibold text-xs text-blue-400">
+                  Upload Thumbnail
+                </p>
               </div>
-              <input type="file" id="file" className="opacity-0 hidden h-[.1px] w-[.1px]" />
+              <input
+                type="file"
+                id="file"
+                className="opacity-0 hidden h-[.1px] w-[.1px]"
+              />
             </label>
           </div>
           <div />
           <label htmlFor="title" className="flex flex-col col-span-2">
             <span className="mb-2 text-lg font-semibold">Title</span>
-            <input className="bg-gray-100 rounded-md px-3 py-2" placeholder="Add video title" type="text" id="title" />
+            <input
+              className="bg-gray-100 rounded-md px-3 py-2"
+              placeholder="Add video title"
+              type="text"
+              id="title"
+            />
           </label>
           <label htmlFor="visibility" className="text-sm col-span-1">
             <span className="text-sm font-semibold">Visibility</span>

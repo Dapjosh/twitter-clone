@@ -9,6 +9,7 @@ const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
 const tweetRoutes = require("./routes/tweet-routes");
 const HttpError = require("./models/http-error");
+const morgan = require("morgan");
 
 const app = express();
 
@@ -29,6 +30,13 @@ app.use(
   "/uploads/images",
   express.static(path.join(__dirname, "uploads/images"))
 );
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "logs/access.log"),
+  { flags: "a" }
+);
+
+// Use Morgan middleware to log HTTP requests to the file
+app.use(morgan("combined", { stream: accessLogStream }));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
